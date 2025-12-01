@@ -1057,11 +1057,28 @@ function playEpisode(index) {
     // 切换弹幕
     if (art.plugins && art.plugins.artplayerPluginDanmuku) {
       currentDanmukuUrl = newDanmukuUrl;
+
+      // 1. 先清空当前弹幕，避免显示上一集的弹幕
       art.plugins.artplayerPluginDanmuku.config({
-        danmuku: createDanmakuLoader(newDanmukuUrl),
+        danmuku: [],
       });
       art.plugins.artplayerPluginDanmuku.load();
-      console.log("已切换弹幕");
+
+      // 2. 手动加载新弹幕数据
+      const loadDanmaku = createDanmakuLoader(newDanmukuUrl);
+      loadDanmaku().then((danmakuData) => {
+        // 检查是否还是当前需要的弹幕（防止快速切换导致的竞态）
+        if (currentDanmukuUrl !== newDanmukuUrl) {
+          console.log("忽略过期的弹幕请求");
+          return;
+        }
+
+        art.plugins.artplayerPluginDanmuku.config({
+          danmuku: danmakuData,
+        });
+        art.plugins.artplayerPluginDanmuku.load();
+        console.log("已切换弹幕 (手动加载完成), 条数:", danmakuData.length);
+      });
     }
   }
 

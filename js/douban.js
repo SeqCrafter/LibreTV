@@ -297,6 +297,19 @@ function renderDoubanMovieTvSwitch() {
 
   if (!movieToggle || !tvToggle) return;
 
+  // 初始化按钮状态
+  if (doubanMovieTvCurrentSwitch === "movie") {
+    movieToggle.classList.add("bg-pink-600", "text-white");
+    movieToggle.classList.remove("text-gray-300");
+    tvToggle.classList.remove("bg-pink-600", "text-white");
+    tvToggle.classList.add("text-gray-300");
+  } else {
+    tvToggle.classList.add("bg-pink-600", "text-white");
+    tvToggle.classList.remove("text-gray-300");
+    movieToggle.classList.remove("bg-pink-600", "text-white");
+    movieToggle.classList.add("text-gray-300");
+  }
+
   movieToggle.addEventListener("click", function () {
     if (doubanMovieTvCurrentSwitch !== "movie") {
       // 更新按钮样式
