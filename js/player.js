@@ -125,7 +125,8 @@ function createDanmakuLoader(danmukuUrl) {
           return response.json();
         })
         .then((data) => {
-          if (data.code === 0) {
+          if (data.code === 0 || data.code === 23) {
+            // 23和0都表示成功，取决于弹幕服务的来源
             const convertedData = convertDanmakuData(data);
             console.log("弹幕数据加载成功:", convertedData.length, "条");
             resolve(convertedData);
@@ -148,12 +149,14 @@ function buildDanmakuUrl(doubanId, episodeNumber) {
   // 从localStorage读取弹幕API地址
   const danmakuApiBase = localStorage.getItem(DANMAKU_CONFIG.storageKey);
   if (!danmakuApiBase) {
-    console.log('未配置弹幕API，跳过弹幕加载');
+    console.log("未配置弹幕API，跳过弹幕加载");
     return null;
   }
 
   // 构建完整的弹幕URL
-  return `${danmakuApiBase}?douban_id=${encodeURIComponent(doubanId)}&episode_number=${episodeNumber}`;
+  return `${danmakuApiBase}?douban_id=${encodeURIComponent(
+    doubanId
+  )}&episode_number=${episodeNumber}`;
 }
 
 // 页面加载
@@ -1506,7 +1509,7 @@ function setupLongPressSpeedControl() {
         e.preventDefault();
       }, 500);
     },
-    { passive: false }
+    {passive: false}
   );
 
   // 触摸结束事件
@@ -1552,7 +1555,7 @@ function setupLongPressSpeedControl() {
         e.preventDefault();
       }
     },
-    { passive: false }
+    {passive: false}
   );
 
   // 视频暂停时取消长按状态
@@ -1682,7 +1685,7 @@ async function testVideoSourceSpeed(sourceKey, vodId) {
       const customIndex = sourceKey.replace("custom_", "");
       const customApi = getCustomApiInfo(customIndex);
       if (!customApi) {
-        return { speed: -1, error: "API配置无效" };
+        return {speed: -1, error: "API配置无效"};
       }
       if (customApi.detail) {
         apiParams =
@@ -1713,19 +1716,19 @@ async function testVideoSourceSpeed(sourceKey, vodId) {
     );
 
     if (!response.ok) {
-      return { speed: -1, error: "获取失败" };
+      return {speed: -1, error: "获取失败"};
     }
 
     const data = await response.json();
 
     if (!data.episodes || data.episodes.length === 0) {
-      return { speed: -1, error: "无播放源" };
+      return {speed: -1, error: "无播放源"};
     }
 
     // 测试第一个播放链接的响应速度
     const firstEpisodeUrl = data.episodes[0];
     if (!firstEpisodeUrl) {
-      return { speed: -1, error: "链接无效" };
+      return {speed: -1, error: "链接无效"};
     }
 
     // 测试视频链接响应时间
@@ -1804,13 +1807,13 @@ async function showSwitchResourceModal() {
   // 搜索
   const resourceOptions = selectedAPIs.map((curr) => {
     if (API_SITES[curr]) {
-      return { key: curr, name: API_SITES[curr].name };
+      return {key: curr, name: API_SITES[curr].name};
     }
     const customIndex = parseInt(curr.replace("custom_", ""), 10);
     if (customAPIs[customIndex]) {
-      return { key: curr, name: customAPIs[customIndex].name || "自定义资源" };
+      return {key: curr, name: customAPIs[customIndex].name || "自定义资源"};
     }
-    return { key: curr, name: "未知资源" };
+    return {key: curr, name: "未知资源"};
   });
   let allResults = {};
   await Promise.all(
